@@ -6,7 +6,7 @@
         </b-button>
     </div>
     <br>
-    <h1>Wo muss ich eine Makse draußen tragen</h1>
+    <h1>Wo muss ich eine Maske draußen tragen</h1>
     <div id="map"></div>
     <button id="asdasd" @click="exportGeo">Export</button>
 </div>
