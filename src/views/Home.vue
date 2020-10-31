@@ -89,7 +89,7 @@ export default {
             }, {
                 "type": "Feature",
                 "properties": {
-                    description: "Fr-Sa & Feiertagen und tags zuvor, jeweils von 18-4 Uhr"
+                    description: "Fr-Sa sowie an Feiertagen und tags zuvor, <br> jeweils von 18 Uhr bis 4 Uhr am Folgetag"
                 },
                 "geometry": {
                     "type": "Polygon",
@@ -136,7 +136,7 @@ export default {
             }, {
                 "type": "Feature",
                 "properties": {
-                    description: "Fr-Sa & Feiertagen und tags zuvor,jeweils von 20-24 Uhr "
+                    description: "Fr-Sa & Feiertagen und tags zuvor,<br>jeweils von 20-24 Uhr "
                 },
                 "geometry": {
                     "type": "Polygon",
@@ -153,7 +153,7 @@ export default {
             }, {
                 "type": "Feature",
                 "properties": {
-                    description: "freitags und sonnabends von 19 Uhr bis 3 Uhr am Folgetag"
+                    description: "freitags und sonnabends von<br>19 Uhr bis 3 Uhr am Folgetag"
                 },
                 "geometry": {
                     "type": "Polygon",
