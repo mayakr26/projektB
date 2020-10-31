@@ -1,7 +1,7 @@
 <template>
 <div id="home">
     <div id="btn">
-        <b-button :to="{path: 'info'}">
+        <b-button variant="primary" :to="{path: 'info'}">
             <b-icon icon="card-text" aria-hidden="true" class="mr-1"></b-icon> Info
         </b-button>
     </div>
@@ -32,10 +32,12 @@ export default {
             attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
         });
 
+        /*
         this.map.pm.addControls({
             position: 'topleft',
             drawCircle: false,
         });
+        */
 
         tiles.addTo(this.map);
 
