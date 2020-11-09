@@ -277,7 +277,7 @@ export default {
             language: "de",
             google: {
                 version: "3",
-                key: "AIzaSyBvij9Z3ODJMsJaydSspUhuI3gIFst54WE"
+                key: process.env.VUE_APP_GOOGLE_TOKEN
             }
         });
 
