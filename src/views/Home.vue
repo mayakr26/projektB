@@ -6,7 +6,6 @@
         </b-button>
     </div>
     <br>
-    <h1>Wo muss ich eine Maske draußen tragen</h1>
     <div id="map"></div>
     <button id="asdasd" @click="exportGeo">Export</button>
 </div>
@@ -17,6 +16,8 @@ import L from 'leaflet'
 import '@geoman-io/leaflet-geoman-free';
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 import geolocator from 'geolocator';
+import Vue from 'vue'
+import VueSimpleAlert from "vue-simple-alert";
 
 export default {
 
@@ -27,19 +28,22 @@ export default {
     },
 
     mounted() {
+        Vue.use(VueSimpleAlert);
+        this.$alert("In den blau markierten Felder musst du draußen eine Maske tagen. Für mehr Informationen klicke auf den Info-Button ");
+
+        var point = [];
+
         this.map = L.map('map').setView([53.56, 10], 14);
         const tiles = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
             maxZoom: 20,
             attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
         });
 
-        /*
-        this.map.pm.addControls({
+        /*this.map.pm.addControls({
             position: 'topleft',
             drawCircle: false,
         });
         */
-
         tiles.addTo(this.map);
 
         // this.map.on('locationfound', this.onLocationFound);
@@ -288,8 +292,8 @@ export default {
             maximumAge: 0, // disable cache
             desiredAccuracy: 30, // meters
             fallbackToIP: true, // fallback to IP if Geolocation fails or rejected
-            addressLookup: true, // requires Google API key if true
-            timezone: true, // requires Google API key if true
+            addressLookup: false, // requires Google API key if true
+            timezone: false, // requires Google API key if true
             staticMap: false // get a static map image URL (boolean or options object)
         }
 
@@ -307,9 +311,26 @@ export default {
                 shadowUrl: defaultMarkerShadow,
             });
 
-            L.marker([location.coords.latitude, location.coords.longitude], {
+            point = [location.coords.latitude, location.coords.longitude];
+            console.log(point);
+
+            let marker = L.marker(point, {
                 icon: defaultIcon
-            }).addTo(this.map).bindPopup("Hier bist du :)").openPopup();
+            }).addTo(this.map)
+
+            marker.bindPopup("Hier bist du :)").openPopup();
+
+            var num1 = L.polygon(
+                [
+                    [53.592997, 9.960781],
+                    [53.598903, 9.960781],
+                    [53.598903, 9.975459],
+                    [53.592997, 9.975459],
+                    [53.592997, 9.960781]
+                ]
+            ).addTo(this.map);
+            console.log(num1.toGeoJSON());
+            this.isMarkerInsidePolygon(point, num1.toGeoJSON().geometry.coordinates[0]);
 
         });
 
@@ -336,6 +357,51 @@ export default {
             console.log(collection)
             console.log(JSON.stringify(collection))
         },
+
+        isMarkerInsidePolygon(point, poly) {
+            var x = point[0],
+                y = point[1];
+
+            var inside = false;
+            for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+                var xi = poly[i][0],
+                    yi = poly[i][1];
+                var xj = poly[j][0],
+                    yj = poly[j][1];
+
+                var intersect = ((yi > y) != (yj > y)) &&
+                    (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                if (intersect) {
+                    inside = !inside;
+                }
+            }
+            console.log(inside);
+            return inside;
+
+        },
+
+        isMarkerInsidePolygon2(marker, poly) {
+            var polyPoints = poly.getLatLngs();
+            var x = marker.getLatLng().lat,
+                y = marker.getLatLng().lng;
+
+            var inside = false;
+            for (var i = 0, j = polyPoints.length - 1; i < polyPoints.length; j = i++) {
+                var xi = polyPoints[i].lat,
+                    yi = polyPoints[i].lng;
+                var xj = polyPoints[j].lat,
+                    yj = polyPoints[j].lng;
+
+                var intersect = ((yi > y) != (yj > y)) &&
+                    (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                if (intersect) {
+                    inside = !inside;
+                }
+            }
+            console.log(inside);
+            return inside;
+        },
+
         onLocationFound(e) {
             var radius = e.accuracy;
 
@@ -376,7 +442,7 @@ export default {
     }
 
     #map {
-        height: 80vh;
+        height: 90vh;
         width: 100%
     }
 
