@@ -1,13 +1,15 @@
 <template>
 <div id="home">
-    <div id="btn">
+
+    <div id="top">
         <b-button variant="primary" :to="{path: 'info'}">
             <b-icon icon="card-text" aria-hidden="true" class="mr-1"></b-icon> Info
         </b-button>
+        <p id="maskParagraph"></p>
     </div>
-    <br>
+
     <div id="map"></div>
-    <button id="asdasd" @click="exportGeo">Export</button>
+    <!--<button id="asdasd" @click="exportGeo">Export</button> -->
 </div>
 </template>
 
@@ -29,7 +31,7 @@ export default {
 
     mounted() {
         Vue.use(VueSimpleAlert);
-        this.$alert("In den blau markierten Felder musst du draußen eine Maske tagen. Für mehr Informationen klicke auf den Info-Button ");
+        this.$alert("In den blau markierten Feldern musst du draußen eine Maske tagen. Für mehr Informationen klicke auf den Info-Button ");
 
         var point = [];
 
@@ -371,10 +373,16 @@ export default {
 
                 var intersect = ((yi > y) != (yj > y)) &&
                     (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-                if (intersect) {
-                    inside = !inside;
-                }
             }
+            if (intersect) {
+                inside = !inside;
+            }
+            if (inside) {
+                document.getElementById("maskParagraph").innerHTML = "Du musst eine Maske tragen";
+            } else {
+                document.getElementById("maskParagraph").innerHTML = "Du musst keine Maske tragen";
+            }
+
             console.log(inside);
             return inside;
 
@@ -398,6 +406,7 @@ export default {
                     inside = !inside;
                 }
             }
+
             console.log(inside);
             return inside;
         },
@@ -446,8 +455,9 @@ export default {
         width: 100%
     }
 
-    #btn {
-        text-align: left;
+    #top {
+        display: flex;
+        justify-content: space-between;
         margin: 10px;
     }
 
