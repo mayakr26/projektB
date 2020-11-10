@@ -15,6 +15,7 @@
 
 <script>
 import L from 'leaflet'
+import '@/plugins/contains'
 import '@geoman-io/leaflet-geoman-free';
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 import geolocator from 'geolocator';
@@ -251,7 +252,7 @@ export default {
                 }
             }]
         };
-        L.geoJSON(data).bindTooltip(function (layer) {
+        this.features = L.geoJSON(data).bindTooltip(function (layer) {
             return layer.feature.properties.description || '';
         }).addTo(this.map);
 
@@ -294,8 +295,8 @@ export default {
             maximumAge: 0, // disable cache
             desiredAccuracy: 30, // meters
             fallbackToIP: true, // fallback to IP if Geolocation fails or rejected
-            addressLookup: false, // requires Google API key if true
-            timezone: false, // requires Google API key if true
+            addressLookup: true, // requires Google API key if true
+            timezone: true, // requires Google API key if true
             staticMap: false // get a static map image URL (boolean or options object)
         }
 
@@ -320,19 +321,30 @@ export default {
                 icon: defaultIcon
             }).addTo(this.map)
 
-            marker.bindPopup("Hier bist du :)").openPopup();
+            marker.bindPopup("Hier bist du").openPopup();
 
-            var num1 = L.polygon(
-                [
-                    [53.592997, 9.960781],
-                    [53.598903, 9.960781],
-                    [53.598903, 9.975459],
-                    [53.592997, 9.975459],
-                    [53.592997, 9.960781]
-                ]
-            ).addTo(this.map);
-            console.log(num1.toGeoJSON());
-            this.isMarkerInsidePolygon(point, num1.toGeoJSON().geometry.coordinates[0]);
+            var isInsidePolygon = false;
+
+            //example position which is in one of the polygons
+            //let marker1 = L.marker([53.552306, 10.010126]);
+
+            //this.isMarkerInsidePolygon(point, num1.toGeoJSON().geometry.coordinates[0]);
+
+            if (this.features._layers) {
+                for (var f in this.features._layers) {
+                    var feature = this.features._layers[f];
+                    console.log(feature.contains(marker.getLatLng()));
+                    if (feature.contains(marker.getLatLng())) {
+                        isInsidePolygon = true;
+                    }
+                }
+            }
+
+            if (isInsidePolygon) {
+                document.getElementById("maskParagraph").innerHTML = "Maske draußen: <strong>Ja</strong>";
+            } else {
+                document.getElementById("maskParagraph").innerHTML = "Maske draußen: <strong>Nein</strong>";
+            }
 
         });
 
@@ -358,57 +370,6 @@ export default {
 
             console.log(collection)
             console.log(JSON.stringify(collection))
-        },
-
-        isMarkerInsidePolygon(point, poly) {
-            var x = point[0],
-                y = point[1];
-
-            var inside = false;
-            for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) {
-                var xi = poly[i][0],
-                    yi = poly[i][1];
-                var xj = poly[j][0],
-                    yj = poly[j][1];
-
-                var intersect = ((yi > y) != (yj > y)) &&
-                    (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-            }
-            if (intersect) {
-                inside = !inside;
-            }
-            if (inside) {
-                document.getElementById("maskParagraph").innerHTML = "Du musst eine Maske tragen";
-            } else {
-                document.getElementById("maskParagraph").innerHTML = "Du musst keine Maske tragen";
-            }
-
-            console.log(inside);
-            return inside;
-
-        },
-
-        isMarkerInsidePolygon2(marker, poly) {
-            var polyPoints = poly.getLatLngs();
-            var x = marker.getLatLng().lat,
-                y = marker.getLatLng().lng;
-
-            var inside = false;
-            for (var i = 0, j = polyPoints.length - 1; i < polyPoints.length; j = i++) {
-                var xi = polyPoints[i].lat,
-                    yi = polyPoints[i].lng;
-                var xj = polyPoints[j].lat,
-                    yj = polyPoints[j].lng;
-
-                var intersect = ((yi > y) != (yj > y)) &&
-                    (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-                if (intersect) {
-                    inside = !inside;
-                }
-            }
-
-            console.log(inside);
-            return inside;
         },
 
         onLocationFound(e) {
