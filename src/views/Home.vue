@@ -62,7 +62,13 @@ export default {
             "features": [{
                 "type": "Feature",
                 "properties": {
-                    description: "täglich von 12 Uhr bis 22 Uhr"
+                    description: "täglich von 12 Uhr bis 22 Uhr",
+                    hours: [{
+                        hour_from: "12:00:0",
+                        hour_to: "22:00:0",
+                        weekday: [0, 1, 2, 3, 4, 5, 6]
+                    }]
+
                 },
                 "geometry": {
                     "type": "Polygon",
@@ -90,7 +96,12 @@ export default {
             }, {
                 "type": "Feature",
                 "properties": {
-                    description: "täglich von 15 Uhr bis 18 Uhr"
+                    description: "täglich von 15 Uhr bis 18 Uhr",
+                    hours: [{
+                        hour_from: "15:00:0",
+                        hour_to: "18:00:0",
+                        weekday: [0, 1, 2, 3, 4, 5, 6]
+                    }]
                 },
                 "geometry": {
                     "type": "Polygon",
@@ -107,7 +118,12 @@ export default {
             }, {
                 "type": "Feature",
                 "properties": {
-                    description: "Fr-Sa sowie an Feiertagen und tags zuvor, <br> jeweils von 18 Uhr bis 4 Uhr am Folgetag"
+                    description: "Fr-Sa sowie an Feiertagen und tags zuvor, <br> jeweils von 18 Uhr bis 4 Uhr am Folgetag",
+                    hours: [{
+                        hour_from: "18:00:0",
+                        hour_to: "04:00:0",
+                        weekday: [5, 6]
+                    }]
                 },
                 "geometry": {
                     "type": "Polygon",
@@ -154,7 +170,12 @@ export default {
             }, {
                 "type": "Feature",
                 "properties": {
-                    description: "Fr-Sa & Feiertagen und tags zuvor,<br>jeweils von 20-24 Uhr "
+                    description: "Fr-Sa & Feiertagen und tags zuvor,<br>jeweils von 20-24 Uhr ",
+                    hours: [{
+                        hour_from: "20:00:0",
+                        hour_to: "24:00:0",
+                        weekday: [5, 6]
+                    }]
                 },
                 "geometry": {
                     "type": "Polygon",
@@ -171,7 +192,12 @@ export default {
             }, {
                 "type": "Feature",
                 "properties": {
-                    description: "freitags und sonnabends von<br>19 Uhr bis 3 Uhr am Folgetag"
+                    description: "freitags und sonnabends von<br>19 Uhr bis 3 Uhr am Folgetag",
+                    hours: [{
+                        hour_from: "19:00:0",
+                        hour_to: "03:00:0",
+                        weekday: [5, 6]
+                    }]
                 },
                 "geometry": {
                     "type": "Polygon",
@@ -208,7 +234,12 @@ export default {
             }, {
                 "type": "Feature",
                 "properties": {
-                    description: "täglich von 12 Uhr bis 1 Uhr am Folgetag"
+                    description: "täglich von 12 Uhr bis 1 Uhr am Folgetag",
+                    hours: [{
+                        hour_from: "12:00:0",
+                        hour_to: "01:00:0",
+                        weekday: [0, 1, 2, 3, 4, 5, 6]
+                    }]
 
                 },
                 "geometry": {
@@ -226,7 +257,12 @@ export default {
             }, {
                 "type": "Feature",
                 "properties": {
-                    description: "Mo-Fr: 6-18 Uhr & So-Sa: 11-18 Uhr"
+                    description: "Mo-Fr: 6-18 Uhr & So-Sa: 11-18 Uhr",
+                    hours: [{
+                        hour_from: "06:00:0",
+                        hour_to: "18:00:0",
+                        weekday: [0, 1, 2, 3, 4, 5, 6]
+                    }]
                 },
                 "geometry": {
                     "type": "Polygon",
@@ -295,8 +331,8 @@ export default {
             maximumAge: 0, // disable cache
             desiredAccuracy: 30, // meters
             fallbackToIP: true, // fallback to IP if Geolocation fails or rejected
-            addressLookup: true, // requires Google API key if true
-            timezone: true, // requires Google API key if true
+            addressLookup: false, // requires Google API key if true
+            timezone: false, // requires Google API key if true
             staticMap: false // get a static map image URL (boolean or options object)
         }
 
@@ -323,8 +359,6 @@ export default {
 
             marker.bindPopup("Hier bist du").openPopup();
 
-            var isInsidePolygon = false;
-
             //example position which is in one of the polygons
             //let marker1 = L.marker([53.552306, 10.010126]);
 
@@ -332,7 +366,21 @@ export default {
 
             if (this.features._layers) {
                 for (var f in this.features._layers) {
+                    var isInsidePolygon = false;
+                    var sameWeekday = false;
+                    var rightWeekday = false;
                     var feature = this.features._layers[f];
+                    console.log(feature.feature.properties.hours[0].hour_from);
+                    var rightTime = (this.getNow().time >= feature.feature.properties.hours[0].hour_from) && (this.getNow().time <= feature.feature.properties.hours[0].hour_to);
+                    for (var i = 0; i < feature.feature.properties.hours[0].weekday.length; i++) {
+                        rightWeekday = feature.feature.properties.hours[0].weekday[i] == this.getNow().weekday;
+                        console.log(feature.feature.properties.hours[0].weekday[i] + "   " + this.getNow().weekday);
+                        if (rightWeekday) {
+                            sameWeekday = true;
+                        }
+                    }
+
+                    console.log(rightTime + "   " + sameWeekday);
                     console.log(feature.contains(marker.getLatLng()));
                     if (feature.contains(marker.getLatLng())) {
                         isInsidePolygon = true;
@@ -370,6 +418,17 @@ export default {
 
             console.log(collection)
             console.log(JSON.stringify(collection))
+        },
+
+        getNow() {
+            const today = new Date();
+            const weekday = today.getDay();
+            const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+            //const weekdayAndTime = weekday + " " + time;
+            return {
+                weekday,
+                time
+            };
         },
 
         onLocationFound(e) {
