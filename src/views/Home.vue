@@ -360,34 +360,31 @@ export default {
             marker.bindPopup("Hier bist du").openPopup();
 
             //example position which is in one of the polygons
-            //let marker1 = L.marker([53.552306, 10.010126]);
+            let marker1 = L.marker([53.580370, 10.012441]);
 
             //this.isMarkerInsidePolygon(point, num1.toGeoJSON().geometry.coordinates[0]);
 
+            var isInsidePolygon = false;
             if (this.features._layers) {
                 for (var f in this.features._layers) {
-                    var isInsidePolygon = false;
+
                     var sameWeekday = false;
                     var rightWeekday = false;
                     var feature = this.features._layers[f];
-                    console.log(feature.feature.properties.hours[0].hour_from);
-                    var rightTime = (this.getNow().time >= feature.feature.properties.hours[0].hour_from) && (this.getNow().time <= feature.feature.properties.hours[0].hour_to);
+
+                    var rightTime = (this.getNow().time >= feature.feature.properties.hours[0].hour_from) || (this.getNow().time <= feature.feature.properties.hours[0].hour_to);
                     for (var i = 0; i < feature.feature.properties.hours[0].weekday.length; i++) {
                         rightWeekday = feature.feature.properties.hours[0].weekday[i] == this.getNow().weekday;
-                        console.log(feature.feature.properties.hours[0].weekday[i] + "   " + this.getNow().weekday);
                         if (rightWeekday) {
                             sameWeekday = true;
                         }
                     }
 
-                    console.log(rightTime + "   " + sameWeekday);
-                    console.log(feature.contains(marker.getLatLng()));
-                    if (feature.contains(marker.getLatLng())) {
+                    if (feature.contains(marker1.getLatLng()) && sameWeekday && rightTime) {
                         isInsidePolygon = true;
                     }
                 }
             }
-
             if (isInsidePolygon) {
                 document.getElementById("maskParagraph").innerHTML = "Maske draußen: <strong>Ja</strong>";
             } else {
