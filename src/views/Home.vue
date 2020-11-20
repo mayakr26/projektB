@@ -32,7 +32,7 @@ export default {
 
     mounted() {
         Vue.use(VueSimpleAlert);
-        this.$alert("In den blau markierten Feldern musst du draußen eine Maske tagen. Für mehr Informationen klicke auf den Info-Button ");
+        this.$alert("In den blau markierten Feldern musst du draußen eine Maske tragen. Für mehr Informationen klicke auf den Info-Button ");
 
         var point = [];
 
@@ -530,7 +530,7 @@ export default {
             marker.bindPopup("Hier bist du").openPopup();
 
             //example position which is in one of the polygons
-            let marker1 = L.marker([53.580370, 10.012441]);
+            //let marker1 = L.marker([53.580370, 10.012441]);
 
             //this.isMarkerInsidePolygon(point, num1.toGeoJSON().geometry.coordinates[0]);
 
@@ -550,7 +550,7 @@ export default {
                         }
                     }
 
-                    if (feature.contains(marker1.getLatLng()) && sameWeekday && rightTime) {
+                    if (feature.contains(marker.getLatLng()) && sameWeekday && rightTime) {
                         isInsidePolygon = true;
                     }
                 }
