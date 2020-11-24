@@ -120,24 +120,6 @@ export default {
     },
 
     methods: {
-        exportGeo() {
-            var collection = {
-                "type": "FeatureCollection",
-                "features": []
-            };
-
-            // Iterate the layers of the map
-            this.map.eachLayer(function (layer) {
-                // Check if layer is a marker
-                if (layer instanceof L.Marker || layer instanceof L.Polyline || layer instanceof L.Polygon) {
-                    // Create GeoJSON object from marker
-                    var geojson = layer.toGeoJSON();
-                    // Push GeoJSON object to collection
-                    collection.features.push(geojson);
-                }
-            });
-        },
-
         getNow() {
             const today = new Date();
             const weekday = today.getDay();
