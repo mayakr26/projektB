@@ -13,6 +13,7 @@
     "bootstrap-vue": "^2.19.0",
     "geolocator": "^2.1.5",
     "leaflet": "^1.7.1",
+    "leaflet.gridlayer.googlemutant": "^0.10.1",
     "vue": "^2.6.12",
     "vue-router": "^3.4.7",
     "vue-simple-alert": "^1.1.1"
